@@ -1,7 +1,7 @@
 
-# Your name:
+# Your name: Summer Daniel
 # Your student id:
-# Your email:
+# Your email: summerld@umich.edu
 # List who you have worked with on this project:
 
 import unittest
@@ -34,11 +34,13 @@ def make_positions_table(data, cur, conn):
         cur.execute("INSERT OR IGNORE INTO Positions (id, position) VALUES (?,?)",(i, positions[i]))
     conn.commit()
 
+
 ## [TASK 1]: 25 points
 # Finish the function make_players_table
 
 #     This function takes 3 arguments: JSON data,
 #         the database cursor, and the database connection object
+#           so data, cur, and con
 
 #     It iterates through the JSON data to get a list of players in the squad
 #     and loads them into a database table called 'Players'
@@ -53,7 +55,122 @@ def make_positions_table(data, cur, conn):
 #     created for you -- see make_positions_table above for details.
 
 def make_players_table(data, cur, conn):
+    cur.execute("DROP TABLE IF EXISTS Players")
+    cur.execute("CREATE TABLE Players (id INTEGER PRIMARY KEY, name INTEGER, position_id INTEGER, birthyear INTEGER, nationality TEXT)")
+    #position_ids = []
+    #ids = []
+    #names = []
+    #years = []
+    #nats = []
+    #test_list = []
+   
+
+    for player in data['squad']:
+        #cur.execute("SELECT position,id FROM Positions")
+        cur.execute("SELECT id FROM Positions WHERE position = ?", (player['position'],))
+        #position_tester = cur.fetchall()
+        position_id = int(cur.fetchone()[0])
+
+        cur.execute("INSERT INTO Players (id, name, position_id, birthyear, nationality) VALUES (?,?,?,?,?)",
+                     (player['id'], player['name'], position_id, player['dateOfBirth'][:4], player['nationality']))
+        conn.commit()
+        #print(player)
+        #test_list.append(player)
+        #position = player['position']
+        #print(position)
+        #position_id
+        '''
+        for word in position_tester:
+            if position in word:
+                position_id = word[1]
+                position_ids.append(position_id)
+        #id
+        id_ = player['id']
+        ids.append(id_)
+        #name
+        name = player['name']
+        names.append(name)
+        #birthyear
+        date = player['dateOfBirth']
+        year = date[:4]
+        years.append(year)
+        #nationality
+        nat = player['nationality']
+        nats.append(nat)
+    
+    #testing = cur.fetchall()
+    #print(testing)
+    #cur.execute("INSERT OR IGNORE INTO Players (id, name, position_id, birthyear, nationality) VALUES (?,?,?,?,?)",(ids, names, position_ids, years, nats))
+    for i in range(len(position_ids)):
+        cur.execute("INSERT OR IGNORE INTO Players (id, name, position_id, birthyear, nationality) VALUES (?,?,?,?,?)",(ids[i], names[i], position_ids[i], years[i], nats[i]))
+    cur.execute("SELECT * from Players")
+    testing = cur.fetchall()
+    print(testing)
+    conn.commit()
+    '''            
+
+            #print(p_and_i)
+            #if 
+            #for x in position_id:
+
+                #print(x)
+                #print(position)
+            
+                #if position in x:
+                
+                #print(position)
+                #cur.execute("SELECT position,id from Positions")
+                #position_id = cur.fetchall()
+                #print(position_id)
+                        #if position in position_id:
+                #print(word)
+                #cur.execute("SELECT position,id from Positions")
+                #position_id = cur.fetchall()
+                #print(position_id)
+        #print(position)
+        #if position == position_id:
+            #cur.execute("SELECT id from Positions")
+            #check_this = cur.fetchall()
+            #print(check_this)
+    #for word in test_this:
+ 
+        #print(player['position'])
+    #cur.execute("CREATE TABLE IF NOT EXISTS Players (id INTEGER PRIMARY KEY, name TEXT UNIQUE, position_id INTEGER, birthyear INTEGER, nationality TEXT UNIQUE)")
+    #cur.execute("CREATE TABLE IF NOT EXISTS Players (id INTEGER PRIMARY KEY, name TEXT UNIQUE, position TEXT UNIQUE, birthyear INTEGER, nationality TEXT UNIQUE)")
+    #conn.commit()
+
+    #cur.execute("SELECT Positions.id FROM Positions JOIN Players ON Positions.position = Players.position")
+
+        #where player['position']
+        #the id of the position that matches in Position
+    #text unique or not??
+
+    #SELECT Employees.hire_date, Jobs.job_title FROM Employees JOIN Jobs 
+    # ON Employees.job_id = Jobs.job_id
+    #the tricky part is position id 
+        #cur.execute("SELECT id FROM Positions") #WHERE position = position
+        #position_id = cur.fetchall()
+        #print(position_id)
+    # get all records
+    #records = cursor.fetchall()
+
+    #print(fetchall(position_id))
+    #cur.execute("CREATE TABLE IF NOT EXISTS Players (id INTEGER PRIMARY KEY, name TEXT UNIQUE, position_id INTEGER, birthyear INTEGER, nationality TEXT UNIQUE)")
+
+'''
+        position = player['position']
+        if position not in positions:
+            positions.append(position)
+    cur.execute("CREATE TABLE IF NOT EXISTS Positions (id INTEGER PRIMARY KEY, position TEXT UNIQUE)")
+    for i in range(len(positions)):
+        cur.execute("INSERT OR IGNORE INTO Positions (id, position) VALUES (?,?)",(i, positions[i]))
+    conn.commit()
     pass
+'''
+
+
+
+
 
 ## [TASK 2]: 10 points
 # Finish the function nationality_search
@@ -66,6 +183,21 @@ def make_players_table(data, cur, conn):
         # the player's name, their position_id, and their nationality.
 
 def nationality_search(countries, cur, conn):
+    #print(countries)
+    tuple_list = []
+    #Each tuple contains the player's name, their position_id, and their nationality.
+    #cur.execute("SELECT name from Players")
+    cur.execute("SELECT name,position_id,nationality FROM Players")
+    player_tups = cur.fetchall()
+    #print(nationality)
+    for country in countries:
+        for player_tuple in player_tups:
+            if country in player_tuple:
+                #print(player_tuple)
+                tuple_list.append(player_tuple)
+    #print(tuple_list)
+    return tuple_list
+
     pass
 
 ## [TASK 3]: 10 points
@@ -85,6 +217,25 @@ def nationality_search(countries, cur, conn):
 
 
 def birthyear_nationality_search(age, country, cur, conn):
+    #print(2023 - age)
+    age_limit = 2023 - age
+    #need to change to var????
+    #pring players with birthdayes BEFORE 2004
+    nat_search_list = []
+
+    #SWITCH TO VARIABLE!!!!!
+    cur.execute("SELECT name,nationality,birthyear FROM Players WHERE nationality = ?", (country,))
+    tuple_list = cur.fetchall()
+    for person in tuple_list:
+        if person[2] < age_limit:
+            nat_search_list.append(person)
+    #print(nat_search_list)
+    return nat_search_list
+    #print(tuple_list)
+    #return tuple_list
+    # OR!!!! (how you've been doing it)
+
+    #why does it only print 1 age
     pass
 
 ## [TASK 4]: 15 points
@@ -105,6 +256,26 @@ def birthyear_nationality_search(age, country, cur, conn):
     # HINT: You'll have to use JOIN for this task.
 
 def position_birth_search(position, age, cur, conn):
+       #print(2023 - age)
+       #AFTER
+       #WHERE Players.position_id = Position.id
+       birth_search_list = []
+       year_limit = 2023 - age
+       cur.execute("SELECT Players.name,Positions.position,Players.birthyear FROM Players JOIN Positions ON Positions.id = Players.position_id WHERE Positions.position = ?", (position,))
+       no_age_limit = cur.fetchall()
+       #print(no_age_limit)
+       for person in no_age_limit:
+           if person[2] > year_limit:
+            birth_search_list.append(person)
+       #print(birth_search_list)
+       return birth_search_list
+       '''
+       for person in no_age_limit:
+           if person[2] > 1988:
+                tuple_list.append(person)
+       #print(tuple_list)
+       return tuple_list
+       '''
        pass
 
 
