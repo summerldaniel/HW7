@@ -1,6 +1,6 @@
 
 # Your name: Summer Daniel
-# Your student id:
+# Your student id: 00160857
 # Your email: summerld@umich.edu
 # List who you have worked with on this project:
 
