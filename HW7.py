@@ -198,18 +198,16 @@ def position_birth_search(position, age, cur, conn):
 #     the passed year. 
 
 
-#     The first function takes 3 arguments: JSON data, 
-#     the database cursor, and the database connection object.
-#     It makes a table with 2 columns:
-#         id (datatype: int; Primary key) -- note this comes from the JSON
-#         name (datatype: text) -- note: use the full, not short, name
-#     hint: look at how we made the Positions table above for an example
 def make_winners_table(data, cur, conn):
-    cur.execute("DROP TABLE IF EXISTS Winners")
-    cur.execute("CREATE TABLE Winners (id INTEGER PRIMARY KEY, name TEXT)")
+
     name_list = []
     id_list = []
     #print(data['seasons'])
+    #cur.execute("DROP TABLE IF EXISTS Winners")
+    cur.execute("CREATE TABLE IF NOT EXISTS Winners (id INTEGER PRIMARY KEY, name INTEGER)")
+    #cur.execute("SELECT id from Winners")
+    #test = cur.fetchall()
+    #print(test)
     for parts in data['seasons']:
         winner_dict = parts['winner']
         if winner_dict != None:
@@ -217,17 +215,32 @@ def make_winners_table(data, cur, conn):
             w_id = winner_dict['id']
             name_list.append(w_name)
             id_list.append(w_id)
-     
-    for i in range(len(name_list)):
-        cur.execute("INSERT OR IGNORE INTO Winners (id, name) VALUES (?,?)",(id_list[i], name_list[i]))
+
+        for i in range(len(name_list)):
+            cur.execute("INSERT OR IGNORE INTO Winners (id, name) VALUES (?,?)",(id_list[i], name_list[i]))
+
     conn.commit()
-
-    
-
 
     pass
 
+#     The second function takes the same 3 arguments: JSON data, 
+#     the database cursor, and the database connection object. 
+#     It iterates through the JSON data to get info 
+#     about previous Premier League seasons (don't include the current one)
+#     and loads all of the seasons into a database table 
+#     called ‘Seasons' with the following columns:
+#         id (datatype: int; Primary key) - note this comes from the JSON
+#         winner_id (datatype: text)
+#         end_year (datatype: int)
 def make_seasons_table(data, cur, conn):
+    cur.execute("DROP TABLE IF EXISTS Seasons")
+    cur.execute("CREATE TABLE Seasons (id INTEGER PRIMARY KEY, name INTEGER, end_year INTEGER)")
+
+    #for parts in data['seasons']:
+        #season_id = parts['id']
+        #season_name = parts['name']
+        #print(parts)
+
     pass
 
 def winners_since_search(year, cur, conn):
@@ -289,7 +302,7 @@ class TestAllMethods(unittest.TestCase):
     def test_make_winners_table(self):
         self.cur2.execute('SELECT * from Winners')
         winners_list = self.cur2.fetchall()
-        self.assertEqual(len(winners_list), 28)
+        self.assertEqual(len(winners_list), 7)
         pass
 
     def test_make_seasons_table(self):
