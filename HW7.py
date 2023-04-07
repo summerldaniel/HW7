@@ -82,17 +82,14 @@ def make_players_table(data, cur, conn):
         # the player's name, their position_id, and their nationality.
 
 def nationality_search(countries, cur, conn):
-    #print(countries)
     tuple_list = []
-    #Each tuple contains the player's name, their position_id, and their nationality.
-    #cur.execute("SELECT name from Players")
+
     cur.execute("SELECT name,position_id,nationality FROM Players")
     player_tups = cur.fetchall()
-    #print(nationality)
+
     for country in countries:
         for player_tuple in player_tups:
             if country in player_tuple:
-                #print(player_tuple)
                 tuple_list.append(player_tuple)
     #print(tuple_list)
     return tuple_list
@@ -116,13 +113,11 @@ def nationality_search(countries, cur, conn):
 
 
 def birthyear_nationality_search(age, country, cur, conn):
-    #print(2023 - age)
+
     age_limit = 2023 - age
-    #need to change to var????
-    #pring players with birthdayes BEFORE 2004
+
     nat_search_list = []
 
-    #SWITCH TO VARIABLE!!!!!
     cur.execute("SELECT name,nationality,birthyear FROM Players WHERE nationality = ?", (country,))
     tuple_list = cur.fetchall()
     for person in tuple_list:
@@ -130,11 +125,7 @@ def birthyear_nationality_search(age, country, cur, conn):
             nat_search_list.append(person)
     #print(nat_search_list)
     return nat_search_list
-    #print(tuple_list)
-    #return tuple_list
-    # OR!!!! (how you've been doing it)
 
-    #why does it only print 1 age
     pass
 
 ## [TASK 4]: 15 points
@@ -155,9 +146,7 @@ def birthyear_nationality_search(age, country, cur, conn):
     # HINT: You'll have to use JOIN for this task.
 
 def position_birth_search(position, age, cur, conn):
-       #print(2023 - age)
-       #AFTER
-       #WHERE Players.position_id = Position.id
+
        birth_search_list = []
        year_limit = 2023 - age
        cur.execute("SELECT Players.name,Positions.position,Players.birthyear FROM Players JOIN Positions ON Positions.id = Players.position_id WHERE Positions.position = ?", (position,))
@@ -166,15 +155,10 @@ def position_birth_search(position, age, cur, conn):
        for person in no_age_limit:
            if person[2] > year_limit:
             birth_search_list.append(person)
+
        #print(birth_search_list)
        return birth_search_list
-       '''
-       for person in no_age_limit:
-           if person[2] > 1988:
-                tuple_list.append(person)
-       #print(tuple_list)
-       return tuple_list
-       '''
+
        pass
 
 
@@ -221,6 +205,8 @@ def position_birth_search(position, age, cur, conn):
 #         name (datatype: text) -- note: use the full, not short, name
 #     hint: look at how we made the Positions table above for an example
 def make_winners_table(data, cur, conn):
+    cur.execute("DROP TABLE IF EXISTS Winners")
+    cur.execute("CREATE TABLE Winners (id INTEGER PRIMARY KEY, name TEXT)")
     name_list = []
     id_list = []
     #print(data['seasons'])
@@ -231,10 +217,12 @@ def make_winners_table(data, cur, conn):
             w_id = winner_dict['id']
             name_list.append(w_name)
             id_list.append(w_id)
-    cur.execute("CREATE TABLE IF NOT EXISTS Winners (id INTEGER PRIMARY KEY, name TEXT)")
+     
     for i in range(len(name_list)):
         cur.execute("INSERT OR IGNORE INTO Winners (id, name) VALUES (?,?)",(id_list[i], name_list[i]))
     conn.commit()
+
+    
 
 
     pass
@@ -301,7 +289,7 @@ class TestAllMethods(unittest.TestCase):
     def test_make_winners_table(self):
         self.cur2.execute('SELECT * from Winners')
         winners_list = self.cur2.fetchall()
-
+        self.assertEqual(len(winners_list), 28)
         pass
 
     def test_make_seasons_table(self):
